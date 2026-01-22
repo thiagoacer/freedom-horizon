@@ -26,7 +26,7 @@ const leadSchema = z.object({
 type LeadFormValues = z.infer<typeof leadSchema>;
 
 interface LeadFormProps {
-    onSuccess: (name: string) => void;
+    onSuccess: (data: LeadFormValues) => void;
 }
 
 export const LeadForm = ({ onSuccess }: LeadFormProps) => {
@@ -40,19 +40,19 @@ export const LeadForm = ({ onSuccess }: LeadFormProps) => {
     });
 
     const onSubmit = (data: LeadFormValues) => {
-        // In a real scenario, this would POST to a backend/webhook
+        // Lead data captured
         console.log("Lead Capturado:", data);
 
-        // Simulate API delay
+        // Simulate UI delay for perception (Supabase will be async in Index)
         toast.promise(
-            new Promise((resolve) => setTimeout(resolve, 1000)),
+            new Promise((resolve) => setTimeout(resolve, 600)),
             {
                 loading: 'Desbloqueando sua análise...',
                 success: () => {
-                    onSuccess(data.name);
-                    return 'Análise desbloqueada com sucesso!';
+                    onSuccess(data);
+                    return 'Análise desbloqueada!';
                 },
-                error: 'Erro ao desbloquear',
+                error: 'Erro ao processar',
             }
         );
     };

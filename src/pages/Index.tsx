@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gem, Wallet, PiggyBank, Lock, TrendingUp, Sparkles, ShieldCheck, CheckCircle2, Quote, Unlock, CalendarClock, MessageCircle } from "lucide-react";
 import { z } from "zod";
+import { supabase } from "@/lib/supabase";
 import { AutonomyCircle } from "@/components/AutonomyCircle";
 import { AuditInput } from "@/components/AuditInput";
 import { InvestmentSlider } from "@/components/InvestmentSlider";
@@ -35,6 +36,9 @@ const Index = () => {
   const [isUnlocked, setIsUnlocked] = usePersistedState("audit_unlocked", false);
   const [userLeadName, setUserLeadName] = usePersistedState("audit_user_name", "");
 
+  // Analytics State
+  const [hasStarted, setHasStarted] = useState(false);
+
   // CRO Hooks
   const buttonCopyVariant = useABTest('BUTTON_COPY');
   const isMobile = useIsMobile();
@@ -50,12 +54,52 @@ const Index = () => {
 
   const hasInputs = lifestyleCost || currentAssets;
 
+  // --- ANALYTICS HELPER ---
+  const trackEvent = (eventName: string, params: object = {}) => {
+    if (window.dataLayer) {
+      window.dataLayer.push({
+        event: eventName,
+        ...params
+      });
+      console.log(`📡 Evento Disparado: ${eventName}`, params);
+    }
+  };
+
+  // 1. TRACK START JOURNEY
+  useEffect(() => {
+    if (!hasStarted && (lifestyleCost || currentAssets)) {
+      setHasStarted(true);
+      trackEvent("audit_start", {
+        step: "input_data"
+      });
+    }
+  }, [lifestyleCost, currentAssets, hasStarted]);
+
   const handleUnlock = (name: string) => {
     setUserLeadName(name);
     setIsUnlocked(true);
+
+    // 2. TRACK COMPLETION & SEGMENTATION
+    // Determine quality based on assets (Simple heuristic: > 500k is high ticket)
+    const assetValue = parseInt(currentAssets.toString().replace(/\./g, '')) || 0;
+    const leadQuality = assetValue > 500000 ? "high_ticket" : "standard";
+
+    trackEvent("audit_complete", {
+      freedom_years: calculations.yearsToFreedom.toFixed(1),
+      freedom_number: calculations.freedomNumber,
+      current_assets: assetValue,
+      percentage_done: calculations.percentage.toFixed(1),
+      lead_quality: leadQuality
+    });
   };
 
   const handleContactSarah = () => {
+    // 3. TRACK CONVERSION CLICK
+    trackEvent("contact_whatsapp_click", {
+      location: "results_page",
+      value: calculations.freedomNumber
+    });
+
     const phone = "551151929255";
     const years = Math.floor(calculations.yearsToFreedom);
     const text = `Olá Sarah! A ferramenta me mostrou que posso ser livre em ${years} anos. Quero entender como a consultoria pode ajudar.`;
