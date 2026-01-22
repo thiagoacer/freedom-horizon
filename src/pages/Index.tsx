@@ -76,7 +76,7 @@ const Index = () => {
         <div className="flex items-center justify-center gap-3 mb-4">
           <Gem size={16} strokeWidth={1.5} className="text-bronze" />
           <span className="text-[10px] font-sans text-muted-foreground tracking-[0.35em] uppercase font-medium">
-            Wealth Timeline
+            Sarah Botelho - Planejadora Financeira
           </span>
         </div>
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif text-foreground tracking-tight leading-tight">
@@ -398,13 +398,17 @@ const Index = () => {
 
       {/* Footer */}
       <motion.footer
-        className="py-10 text-center border-t border-border/50"
+        className="py-10 text-center border-t border-border/50 space-y-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1.4 }}
       >
         <p className="text-[10px] font-sans text-muted-foreground tracking-[0.2em] uppercase">
           Para mulheres que escolhem construir patrimônio
+        </p>
+        <p className="text-[10px] font-sans text-muted-foreground/50">
+          © 2025 Todos os direitos reservados. <br />
+          Sarah Botelho & Agência Flow.
         </p>
       </motion.footer>
     </div>
