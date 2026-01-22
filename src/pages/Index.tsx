@@ -14,7 +14,9 @@ import { LeadForm } from "@/components/LeadForm";
 import { Button } from "@/components/ui/button";
 import { useABTest } from "@/hooks/use-ab-test";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { parseMoney } from "@/lib/utils";
+import { calculateLeadScore } from "@/lib/scoring";
 
 // Schema for financial inputs to ensure safety and integrity
 const MoneySchema = z
