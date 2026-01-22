@@ -75,13 +75,35 @@ const Index = () => {
     }
   }, [lifestyleCost, currentAssets, hasStarted]);
 
-  const handleUnlock = (name: string) => {
-    setUserLeadName(name);
+  const handleUnlock = async (formData: { name: string; email: string; whatsapp: string }) => {
+    setUserLeadName(formData.name);
+
+    // 1. Save to Supabase
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .insert([
+          {
+            nome: formData.name,
+            email: formData.email,
+            whatsapp: formData.whatsapp,
+            patrimonio_atual: parseFloat(currentAssets.toString().replace(/\./g, '')) || 0,
+            custo_vida: parseFloat(lifestyleCost.toString().replace(/\./g, '')) || 0,
+            anos_liberdade: parseFloat(calculations.yearsToFreedom.toFixed(2))
+          }
+        ]);
+
+      if (error) throw error;
+      console.log("✅ Lead salvo no Supabase!");
+    } catch (err) {
+      // console.error("Error saving lead (non-blocking):", err);
+    }
+
     setIsUnlocked(true);
 
     // 2. TRACK COMPLETION & SEGMENTATION
     // Determine quality based on assets (Simple heuristic: > 500k is high ticket)
-    const assetValue = parseInt(currentAssets.toString().replace(/\./g, '')) || 0;
+    const assetValue = parseFloat(currentAssets.toString().replace(/\./g, '')) || 0;
     const leadQuality = assetValue > 500000 ? "high_ticket" : "standard";
 
     trackEvent("audit_complete", {
