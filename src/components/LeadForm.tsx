@@ -26,7 +26,7 @@ const leadSchema = z.object({
 type LeadFormValues = z.infer<typeof leadSchema>;
 
 interface LeadFormProps {
-    onSuccess: () => void;
+    onSuccess: (name: string) => void;
 }
 
 export const LeadForm = ({ onSuccess }: LeadFormProps) => {
@@ -49,7 +49,7 @@ export const LeadForm = ({ onSuccess }: LeadFormProps) => {
             {
                 loading: 'Desbloqueando sua análise...',
                 success: () => {
-                    onSuccess();
+                    onSuccess(data.name);
                     return 'Análise desbloqueada com sucesso!';
                 },
                 error: 'Erro ao desbloquear',

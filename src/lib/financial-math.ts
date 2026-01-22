@@ -4,6 +4,7 @@ export interface FreedomMetrics {
     freedomNumber: number;
     percentage: number;
     yearsToFreedom: number;
+    monthlyInvestment: number;
 }
 
 /**
@@ -12,7 +13,7 @@ export interface FreedomMetrics {
  * @param monthlyCost - Monthly lifestyle cost
  * @param currentAssets - Current net worth/invested assets
  * @param monthlyInvestment - Monthly contribution amount
- * @returns FreedomMetrics object containing target, progress %, and estimated years.
+ * @returns FreedomMetrics object containing target, progress %, estimated years, and the investment used.
  */
 export const calculateFreedomMetrics = (
     monthlyCost: number,
@@ -61,5 +62,6 @@ export const calculateFreedomMetrics = (
         freedomNumber,
         percentage: Math.min(percentage, 100),
         yearsToFreedom,
+        monthlyInvestment: safeInvestment,
     };
 };
