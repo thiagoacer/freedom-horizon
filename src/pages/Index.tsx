@@ -336,84 +336,88 @@ const Index = () => {
                       </motion.div>
 
                       {/* 3. Insights & Upsell */}
-                      <div className="grid md:grid-cols-3 gap-6">
+                      <div className="grid md:grid-cols-2 gap-4">
 
-                        {/* Card A: Acceleration Potential */}
+                        {/* Card A: Acceleration Potential (More Stat Focused) */}
                         <motion.div
                           initial={{ x: -20, opacity: 0 }}
                           animate={{ x: 0, opacity: 1 }}
                           transition={{ delay: 0.6 }}
-                          className="md:col-span-1 p-6 rounded-2xl bg-secondary/30 border border-border flex flex-col justify-between"
+                          className="md:col-span-1 p-6 rounded-2xl bg-secondary/20 border border-border flex flex-col justify-between min-h-[220px]"
                         >
                           <div>
-                            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-4 text-blue-500">
-                              <TrendingUp size={20} />
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                                <TrendingUp size={16} />
+                              </div>
+                              <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Aceleração</h4>
                             </div>
-                            <h4 className="font-medium text-foreground mb-2">Potencial de Aceleração</h4>
-                            <p className="text-xs text-muted-foreground leading-relaxed">
-                              O modelo assume 5% a.a. Se otimizarmos a alocação fiscal da sua carteira para atingir 6.5% reais,
-                              você pode antecipar essa data em até <strong>{(calculations.yearsToFreedom * 0.3).toFixed(1)} anos</strong>.
+
+                            <div className="flex items-baseline gap-2 mb-2">
+                              <span className="text-3xl font-serif text-foreground">
+                                {(calculations.yearsToFreedom * 0.3).toFixed(1)} Anos
+                              </span>
+                              <span className="text-xs text-emerald-600 font-medium bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
+                                -30% Tempo
+                              </span>
+                            </div>
+
+                            <p className="text-xs text-muted-foreground leading-relaxed mt-2">
+                              Otimizando a alocação para <strong>6.5% a.a.</strong> (cenário otimista), você antecipa sua liberdade.
                             </p>
                           </div>
-                          <div className="mt-6 pt-4 border-t border-border/50">
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Cenário Otimista</span>
-                            <p className="text-lg font-serif text-foreground">{(calculations.yearsToFreedom * 0.7).toFixed(1)} Anos</p>
+
+                          <div className="mt-4 pt-4 border-t border-border/50 flex justify-between items-center">
+                            <span className="text-[10px] text-muted-foreground">Nova Previsão</span>
+                            <span className="text-sm font-medium text-foreground">{(calculations.yearsToFreedom * 0.7).toFixed(1)} Anos</span>
                           </div>
                         </motion.div>
 
-                        {/* Card B: Sarah Consultation (Personalized) */}
+                        {/* Card B: Sarah Consultation (Simplified & Clean) */}
                         <motion.div
                           initial={{ x: 20, opacity: 0 }}
                           animate={{ x: 0, opacity: 1 }}
                           transition={{ delay: 0.7 }}
-                          className="md:col-span-2 relative overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-bronze/30 shadow-lg group"
+                          className="md:col-span-1 relative overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-bronze/20 shadow-lg group flex flex-col justify-between min-h-[220px]"
                         >
-                          {/* Elemento decorativo de fundo */}
-                          <div className="absolute top-0 right-0 p-3 opacity-5 text-bronze">
-                            <Quote size={80} />
+                          {/* Elemento decorativo */}
+                          <div className="absolute top-0 right-0 p-4 opacity-5 text-bronze">
+                            <Quote size={60} />
                           </div>
 
-                          <div className="p-6 h-full flex flex-col md:flex-row gap-6 items-center relative z-10">
-
-                            {/* Avatar */}
-                            <div className="relative shrink-0">
-                              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-bronze to-secondary p-[2px]">
-                                <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
-                                  <span className="font-serif text-2xl text-bronze">S</span>
-                                  {/* Se tiver a foto: <img src="..." className="w-full h-full object-cover" /> */}
-                                </div>
-                              </div>
-                              <div className="absolute -bottom-1 -right-1 bg-emerald-500 w-6 h-6 rounded-full border-4 border-background flex items-center justify-center" title="Online Agora">
-                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                              </div>
-                            </div>
-
-                            {/* Texto e Call to Action */}
-                            <div className="flex-1 text-center md:text-left">
-                              <h3 className="text-lg font-serif text-foreground mb-1">
-                                "Vamos validar sua estratégia, {userLeadName || 'Investidora'}?"
-                              </h3>
-                              <p className="text-sm text-muted-foreground mb-5 font-light leading-relaxed">
-                                Os números são apenas o começo. Clique abaixo para me chamar no WhatsApp e agendar nossa conversa.
-                              </p>
-
-                              <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                                {/* BOTÃO CORRIGIDO: Alto Contraste & Tracking */}
-                                <Button
-                                  onClick={handleContactSarah}
-                                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md shadow-emerald-900/10 h-11 px-6 min-w-[200px]"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <MessageCircle size={18} />
-                                    Falar com Sarah
+                          <div className="p-6 relative z-10 flex flex-col h-full">
+                            <div className="flex items-center gap-4 mb-4">
+                              <div className="relative shrink-0">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-bronze to-secondary p-[1px]">
+                                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
+                                    <span className="font-serif text-lg text-bronze">S</span>
                                   </div>
-                                </Button>
-
-                                <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:bg-secondary/50">
-                                  Baixar Relatório PDF
-                                </Button>
+                                </div>
+                                <div className="absolute -bottom-0.5 -right-0.5 bg-emerald-500 w-3 h-3 rounded-full border-2 border-background" />
+                              </div>
+                              <div>
+                                <h3 className="text-base font-medium text-foreground">
+                                  Validar Estratégia
+                                </h3>
+                                <p className="text-xs text-muted-foreground">
+                                  Com Sarah Botelho
+                                </p>
                               </div>
                             </div>
+
+                            <p className="text-sm text-muted-foreground mb-6 flex-grow">
+                              "Os números são o começo. Vamos analisar seu caso pessoalmente?"
+                            </p>
+
+                            <Button
+                              onClick={handleContactSarah}
+                              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium h-10 shadow-md shadow-emerald-900/10 text-sm"
+                            >
+                              <div className="flex items-center justify-center gap-2">
+                                <MessageCircle size={16} />
+                                Chamar no WhatsApp
+                              </div>
+                            </Button>
                           </div>
                         </motion.div>
                       </div>
