@@ -447,22 +447,24 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Sticky Mobile CTA - Only visible when Unlocked & Mobile */}
+      {/* Sticky Mobile CTA - Refinado pelo Design Team */}
       <AnimatePresence>
         {isUnlocked && isMobile && (
           <motion.div
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            exit={{ y: 100 }}
-            className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-50 md:hidden"
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed bottom-6 left-4 right-4 z-50 md:hidden"
           >
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-md rounded-full shadow-2xl -z-10" />
             <Button
               onClick={handleContactSarah}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium h-12 shadow-lg shadow-emerald-900/10"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium h-14 rounded-full shadow-lg shadow-emerald-900/20 text-lg tracking-wide border border-white/10"
             >
-              <div className="flex items-center gap-2">
-                <MessageCircle size={18} />
-                Falar com Sarah no WhatsApp
+              <div className="flex items-center gap-3">
+                <MessageCircle size={20} className="animate-pulse" />
+                Falar com Sarah
               </div>
             </Button>
           </motion.div>
