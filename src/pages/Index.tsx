@@ -389,8 +389,8 @@ const Index = () => {
                             <div className="flex items-center gap-4 mb-4">
                               <div className="relative shrink-0">
                                 <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-bronze to-secondary p-[1px]">
-                                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                                    <span className="font-serif text-lg text-bronze">S</span>
+                                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
+                                    <img src="/sarah-profile.png" alt="Sarah Botelho" className="w-full h-full object-cover" />
                                   </div>
                                 </div>
                                 <div className="absolute -bottom-0.5 -right-0.5 bg-emerald-500 w-3 h-3 rounded-full border-2 border-background" />
