@@ -64,6 +64,7 @@ export const AuditInput = ({
               placeholder={placeholder}
               className="input-luxury w-full pl-10 text-2xl"
               inputMode="numeric"
+              autoComplete="off"
             />
           </div>
         </div>
