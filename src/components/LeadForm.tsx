@@ -120,13 +120,13 @@ export const LeadForm = ({ onSuccess }: LeadFormProps) => {
 
                     <Button
                         type="submit"
-                        className="w-full bg-bronze hover:bg-bronze-dark text-white font-serif transition-all duration-300 shadow-lg hover:shadow-xl"
+                        className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-medium h-12 shadow-lg shadow-emerald-900/20 text-base"
                     >
                         <Lock className="w-4 h-4 mr-2" />
                         Desbloquear Minha Análise
                     </Button>
 
-                    <p className="text-[10px] text-center text-muted-foreground/60 w-full">
+                    <p className="text-[10px] text-center text-muted-foreground/60 w-full font-light">
                         Seus dados estão seguros. Respeitamos a sua privacidade.
                     </p>
                 </form>

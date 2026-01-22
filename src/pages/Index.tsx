@@ -239,11 +239,11 @@ const Index = () => {
                                 <Lock className="w-6 h-6 text-white" strokeWidth={2} />
                               </motion.div>
 
-                              <h3 className="text-xl font-serif text-foreground mb-2">
+                              <h3 className="text-xl font-serif text-foreground mb-4 font-normal">
                                 {buttonCopyVariant === 'A' ? "Sua estratégia está pronta" : "Descubra quando você para"}
                               </h3>
 
-                              <p className="text-sm text-muted-foreground mb-6 font-light leading-relaxed">
+                              <p className="text-sm text-muted-foreground mb-8 font-light leading-relaxed max-w-[280px] mx-auto">
                                 {buttonCopyVariant === 'A'
                                   ? "Calculamos a data exata da sua liberdade. Libere o acesso ao cronograma completo e à análise de aceleração."
                                   : "Pare de adivinhar. Veja exatamente quantos anos faltam para você não depender mais do seu salário."}
