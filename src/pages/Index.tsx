@@ -14,7 +14,6 @@ import { LeadForm } from "@/components/LeadForm";
 import { Button } from "@/components/ui/button";
 import { useABTest } from "@/hooks/use-ab-test";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { parseMoney } from "@/lib/utils";
 import { calculateLeadScore } from "@/lib/scoring";
 
@@ -80,12 +79,20 @@ const Index = () => {
 
   // --- HANDLE UNLOCK (CORE LOGIC) ---
   const handleUnlock = async (formData: { name: string; email: string; whatsapp: string }) => {
-    // 1. Atualiza estado local e corrige bug React #31 (Garante que é string)
+    // 1. Atualiza estado local
     setUserLeadName(formData.name);
 
     // 2. Prepara dados financeiros para salvar
     const assetValue = parseMoney(currentAssets);
     const lifestyleValue = parseMoney(lifestyleCost);
+    const monthlyValue = parseMoney(monthlyInvestment);
+
+    // --- A MÁGICA DO SCORING (Lead Qualification) ---
+    const leadAnalysis = calculateLeadScore({
+      patrimonio: assetValue,
+      aporteMensal: monthlyValue,
+      anosParaLiberdade: calculations.yearsToFreedom
+    });
 
     // 3. SALVA NO SUPABASE
     try {
@@ -96,7 +103,14 @@ const Index = () => {
           whatsapp: formData.whatsapp,
           patrimonio_atual: assetValue,
           custo_vida: lifestyleValue,
+          aporte_mensal: monthlyValue,
           anos_liberdade: parseFloat(calculations.yearsToFreedom.toFixed(2)),
+
+          // INTELLIGENCE FIELDS
+          lead_score: leadAnalysis.score,
+          lead_category: leadAnalysis.categoria,
+          lead_priority: leadAnalysis.prioridade,
+
           origem: 'calculator_v1'
         }
       ]);
@@ -104,7 +118,7 @@ const Index = () => {
       if (error) {
         console.error("Erro Supabase:", error);
       } else {
-        console.log("✅ Lead salvo no Supabase!");
+        console.log("✅ Lead salvo com Score:", leadAnalysis.score, leadAnalysis.categoria);
       }
     } catch (err) {
       console.error("Erro crítico ao salvar:", err);
@@ -113,14 +127,16 @@ const Index = () => {
     setIsUnlocked(true);
 
     // 4. Analytics & Segmentação
-    const leadQuality = assetValue > 500000 ? "high_ticket" : "standard";
-
     trackEvent("audit_complete", {
       freedom_years: calculations.yearsToFreedom.toFixed(1),
       freedom_number: calculations.freedomNumber,
       current_assets: assetValue,
       percentage_done: calculations.percentage.toFixed(1),
-      lead_quality: leadQuality
+
+      // Enriched Data Layer for Ad Optimization
+      lead_score: leadAnalysis.score,
+      lead_category: leadAnalysis.categoria,
+      value: leadAnalysis.score // Optimization Signal for Meta/Google Ads
     });
   };
 
