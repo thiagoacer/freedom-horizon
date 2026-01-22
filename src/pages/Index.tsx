@@ -14,6 +14,7 @@ import { LeadForm } from "@/components/LeadForm";
 import { Button } from "@/components/ui/button";
 import { useABTest } from "@/hooks/use-ab-test";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { parseMoney } from "@/lib/utils";
 
 // Schema for financial inputs to ensure safety and integrity
 const MoneySchema = z
@@ -75,35 +76,41 @@ const Index = () => {
     }
   }, [lifestyleCost, currentAssets, hasStarted]);
 
+  // --- HANDLE UNLOCK (CORE LOGIC) ---
   const handleUnlock = async (formData: { name: string; email: string; whatsapp: string }) => {
+    // 1. Atualiza estado local e corrige bug React #31 (Garante que é string)
     setUserLeadName(formData.name);
 
-    // 1. Save to Supabase
-    try {
-      const { error } = await supabase
-        .from('leads')
-        .insert([
-          {
-            nome: formData.name,
-            email: formData.email,
-            whatsapp: formData.whatsapp,
-            patrimonio_atual: parseFloat(currentAssets.toString().replace(/\./g, '')) || 0,
-            custo_vida: parseFloat(lifestyleCost.toString().replace(/\./g, '')) || 0,
-            anos_liberdade: parseFloat(calculations.yearsToFreedom.toFixed(2))
-          }
-        ]);
+    // 2. Prepara dados financeiros para salvar
+    const assetValue = parseMoney(currentAssets);
+    const lifestyleValue = parseMoney(lifestyleCost);
 
-      if (error) throw error;
-      console.log("✅ Lead salvo no Supabase!");
+    // 3. SALVA NO SUPABASE
+    try {
+      const { error } = await supabase.from('leads').insert([
+        {
+          nome: formData.name,
+          email: formData.email,
+          whatsapp: formData.whatsapp,
+          patrimonio_atual: assetValue,
+          custo_vida: lifestyleValue,
+          anos_liberdade: parseFloat(calculations.yearsToFreedom.toFixed(2)),
+          origem: 'calculator_v1'
+        }
+      ]);
+
+      if (error) {
+        console.error("Erro Supabase:", error);
+      } else {
+        console.log("✅ Lead salvo no Supabase!");
+      }
     } catch (err) {
-      // console.error("Error saving lead (non-blocking):", err);
+      console.error("Erro crítico ao salvar:", err);
     }
 
     setIsUnlocked(true);
 
-    // 2. TRACK COMPLETION & SEGMENTATION
-    // Determine quality based on assets (Simple heuristic: > 500k is high ticket)
-    const assetValue = parseFloat(currentAssets.toString().replace(/\./g, '')) || 0;
+    // 4. Analytics & Segmentação
     const leadQuality = assetValue > 500000 ? "high_ticket" : "standard";
 
     trackEvent("audit_complete", {
