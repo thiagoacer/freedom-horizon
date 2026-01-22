@@ -51,7 +51,8 @@ const Index = () => {
 
   const handleContactSarah = () => {
     const phone = "551151929255";
-    const text = "Olá Sarah! Acabei de desbloquear minha data no Freedom Horizon e gostaria de reivindicar meu diagnóstico gratuito de 30min.";
+    const years = Math.floor(calculations.yearsToFreedom);
+    const text = `Olá Sarah! A ferramenta me mostrou que posso ser livre em ${years} anos. Quero entender como a consultoria pode ajudar.`;
     const link = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 
     window.open(link, "_blank");
@@ -248,7 +249,6 @@ const Index = () => {
 
                       {/* 3. Insights & Upsell */}
                       <div className="grid md:grid-cols-3 gap-6">
-
                         {/* Card A: Acceleration Potential */}
                         <motion.div
                           initial={{ x: -20, opacity: 0 }}
