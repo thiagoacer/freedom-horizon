@@ -9,16 +9,18 @@ export interface FreedomMetrics {
 
 /**
  * Calculates financial freedom metrics based on user inputs.
- * 
+ *
  * @param monthlyCost - Monthly lifestyle cost
  * @param currentAssets - Current net worth/invested assets
  * @param monthlyInvestment - Monthly contribution amount
+ * @param annualReturnRate - Optional annual return rate (defaults to DEFAULT_REAL_RETURN_ANNUAL)
  * @returns FreedomMetrics object containing target, progress %, estimated years, and the investment used.
  */
 export const calculateFreedomMetrics = (
     monthlyCost: number,
     currentAssets: number,
-    monthlyInvestment: number
+    monthlyInvestment: number,
+    annualReturnRate: number = DEFAULT_REAL_RETURN_ANNUAL
 ): FreedomMetrics => {
     // Ensure non-negative inputs (redundant if Zod is used upstream, but good for pure function safety)
     const safeMonthlyCost = Math.max(0, monthlyCost);
@@ -29,7 +31,7 @@ export const calculateFreedomMetrics = (
     const percentage = freedomNumber > 0 ? (safeAssets / freedomNumber) * 100 : 0;
 
     // NPER calculation
-    const monthlyRate = DEFAULT_REAL_RETURN_ANNUAL / 12;
+    const monthlyRate = annualReturnRate / 12;
     let yearsToFreedom = Infinity;
 
     if (freedomNumber > 0 && safeInvestment > 0) {

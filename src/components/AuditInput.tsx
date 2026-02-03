@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import { NumericFormat } from "react-number-format";
+import { InfoTooltip } from "./InfoTooltip";
 
 interface AuditInputProps {
   label: string;
@@ -11,6 +12,7 @@ interface AuditInputProps {
   icon: LucideIcon;
   placeholder?: string;
   delay?: number;
+  tooltip?: string;
 }
 
 export const AuditInput = ({
@@ -22,6 +24,7 @@ export const AuditInput = ({
   icon: Icon,
   placeholder = "0",
   delay = 0,
+  tooltip,
 }: AuditInputProps) => {
   return (
     <motion.div
@@ -35,9 +38,12 @@ export const AuditInput = ({
           <Icon size={18} strokeWidth={1.5} />
         </div>
         <div className="flex-1">
-          <label className="block text-xs font-sans font-medium text-muted-foreground tracking-wide uppercase mb-1">
-            {label}
-          </label>
+          <div className="flex items-center gap-2 mb-1">
+            <label className="block text-xs font-sans font-medium text-muted-foreground tracking-wide uppercase">
+              {label}
+            </label>
+            {tooltip && <InfoTooltip content={tooltip} />}
+          </div>
           {sublabel && (
             <p className="text-[11px] font-sans text-muted-foreground/70 mb-2 font-light leading-relaxed">
               {sublabel}

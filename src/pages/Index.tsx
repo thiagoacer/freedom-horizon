@@ -1,13 +1,16 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gem, Wallet, PiggyBank, Lock, TrendingUp, Sparkles, ShieldCheck, CheckCircle2, Quote, Unlock, CalendarClock, MessageCircle } from "lucide-react";
+import { Gem, Wallet, PiggyBank, Lock, Sparkles, ShieldCheck, CheckCircle2, Quote, MessageCircle } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import { AutonomyCircle } from "@/components/AutonomyCircle";
 import { AuditInput } from "@/components/AuditInput";
 import { InvestmentSlider } from "@/components/InvestmentSlider";
 import { TimelineDisplay } from "@/components/TimelineDisplay";
-import { DEFAULT_MULTIPLIER } from "@/config/financial";
+import { SocialProof } from "@/components/SocialProof";
+import { ScenarioToggle, ScenarioType } from "@/components/ScenarioToggle";
+import { AccelerationCard } from "@/components/AccelerationCard";
+import { DEFAULT_MULTIPLIER, SCENARIO_RATES, OPTIMIZED_RETURN_ANNUAL } from "@/config/financial";
 import { calculateFreedomMetrics } from "@/lib/financial-math";
 import { usePersistedState } from "@/hooks/use-persisted-state";
 import { LeadForm } from "@/components/LeadForm";
@@ -35,6 +38,7 @@ const Index = () => {
   const [lifestyleCost, setLifestyleCost] = usePersistedState("audit_lifestyle_cost", "");
   const [currentAssets, setCurrentAssets] = usePersistedState("audit_current_assets", "");
   const [monthlyInvestment, setMonthlyInvestment] = usePersistedState("audit_monthly_investment", 5000);
+  const [selectedScenario, setSelectedScenario] = usePersistedState<ScenarioType>("audit_scenario", "realista");
   const [isUnlocked, setIsUnlocked] = usePersistedState("audit_unlocked", false);
   const [userLeadName, setUserLeadName] = usePersistedState("audit_user_name", "");
 
@@ -51,8 +55,31 @@ const Index = () => {
     const assets = MoneySchema.parse(currentAssets);
     const investment = MoneySchema.parse(monthlyInvestment);
 
-    return calculateFreedomMetrics(monthly, assets, investment);
-  }, [lifestyleCost, currentAssets, monthlyInvestment]);
+    // Calculate with selected scenario
+    const selectedRate = SCENARIO_RATES[selectedScenario];
+    return calculateFreedomMetrics(monthly, assets, investment, selectedRate);
+  }, [lifestyleCost, currentAssets, monthlyInvestment, selectedScenario]);
+
+  // Calculate acceleration metrics (always with optimized rate)
+  const accelerationMetrics = useMemo(() => {
+    const monthly = MoneySchema.parse(lifestyleCost);
+    const assets = MoneySchema.parse(currentAssets);
+    const investment = MoneySchema.parse(monthlyInvestment);
+
+    const optimizedCalc = calculateFreedomMetrics(monthly, assets, investment, OPTIMIZED_RETURN_ANNUAL);
+    const yearsReduced = calculations.yearsToFreedom - optimizedCalc.yearsToFreedom;
+
+    // Calculate opportunity cost (extra patrimony gained by accelerating)
+    const currentFinalValue = calculations.freedomNumber;
+    const optimizedFinalValue = optimizedCalc.freedomNumber;
+    const opportunityCost = Math.abs(currentFinalValue - optimizedFinalValue);
+
+    return {
+      acceleratedYears: optimizedCalc.yearsToFreedom,
+      yearsReduced: Math.max(0, yearsReduced),
+      opportunityCost,
+    };
+  }, [lifestyleCost, currentAssets, monthlyInvestment, calculations]);
 
   const hasInputs = lifestyleCost || currentAssets;
 
@@ -105,6 +132,8 @@ const Index = () => {
           custo_vida: lifestyleValue,
           aporte_mensal: monthlyValue,
           anos_liberdade: parseFloat(calculations.yearsToFreedom.toFixed(2)),
+          cenario_escolhido: selectedScenario,
+          taxa_retorno_cenario: SCENARIO_RATES[selectedScenario],
 
           // INTELLIGENCE FIELDS
           lead_score: leadAnalysis.score,
@@ -201,6 +230,7 @@ const Index = () => {
                 icon={Wallet}
                 placeholder="20.000"
                 delay={0.1}
+                tooltip="Considere todas as suas despesas mensais: moradia, alimentação, lazer, saúde, educação, etc. Este é o valor que você precisa ter disponível todo mês para manter seu padrão de vida."
               />
 
               <AuditInput
@@ -212,6 +242,7 @@ const Index = () => {
                 icon={PiggyBank}
                 placeholder="800.000"
                 delay={0.2}
+                tooltip="Some todos os seus investimentos: poupança, ações, fundos imobiliários, tesouro direto, CDBs, etc. Não inclua imóveis onde você mora ou bens que não geram renda."
               />
 
               <InvestmentSlider
@@ -221,6 +252,11 @@ const Index = () => {
                 max={50000}
                 step={500}
                 delay={0.3}
+              />
+
+              <ScenarioToggle
+                value={selectedScenario}
+                onChange={setSelectedScenario}
               />
             </div>
 
@@ -290,11 +326,13 @@ const Index = () => {
                                 {buttonCopyVariant === 'A' ? "Sua estratégia está pronta" : "Descubra quando você para"}
                               </h3>
 
-                              <p className="text-sm text-muted-foreground mb-8 font-light leading-relaxed max-w-[280px] mx-auto">
+                              <p className="text-sm text-muted-foreground mb-6 font-light leading-relaxed max-w-[280px] mx-auto">
                                 {buttonCopyVariant === 'A'
                                   ? "Calculamos a data exata da sua liberdade. Libere o acesso ao cronograma completo e à análise de aceleração."
                                   : "Pare de adivinhar. Veja exatamente quantos anos faltam para você não depender mais do seu salário."}
                               </p>
+
+                              <SocialProof />
 
                               <LeadForm onSuccess={handleUnlock} />
 
@@ -356,40 +394,13 @@ const Index = () => {
                       {/* 3. Insights & Upsell */}
                       <div className="grid md:grid-cols-2 gap-4">
 
-                        {/* Card A: Acceleration Potential (More Stat Focused) */}
-                        <motion.div
-                          initial={{ x: -20, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: 0.6 }}
-                          className="md:col-span-1 p-6 rounded-2xl bg-secondary/20 border border-border flex flex-col justify-between min-h-[220px]"
-                        >
-                          <div>
-                            <div className="flex items-center gap-3 mb-4">
-                              <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
-                                <TrendingUp size={16} />
-                              </div>
-                              <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Aceleração</h4>
-                            </div>
-
-                            <div className="flex items-baseline gap-2 mb-2">
-                              <span className="text-3xl font-serif text-foreground">
-                                {(calculations.yearsToFreedom * 0.3).toFixed(1)} Anos
-                              </span>
-                              <span className="text-xs text-emerald-600 font-medium bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
-                                -30% Tempo
-                              </span>
-                            </div>
-
-                            <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-                              Otimizando a alocação para <strong>6.5% a.a.</strong> (cenário otimista), você antecipa sua liberdade.
-                            </p>
-                          </div>
-
-                          <div className="mt-4 pt-4 border-t border-border/50 flex justify-between items-center">
-                            <span className="text-[10px] text-muted-foreground">Nova Previsão</span>
-                            <span className="text-sm font-medium text-foreground">{(calculations.yearsToFreedom * 0.7).toFixed(1)} Anos</span>
-                          </div>
-                        </motion.div>
+                        {/* Card A: Acceleration Potential */}
+                        <AccelerationCard
+                          currentYears={calculations.yearsToFreedom}
+                          acceleratedYears={accelerationMetrics.acceleratedYears}
+                          yearsReduced={accelerationMetrics.yearsReduced}
+                          opportunityCost={accelerationMetrics.opportunityCost}
+                        />
 
                         {/* Card B: Sarah Consultation (Simplified & Clean) */}
                         <motion.div
